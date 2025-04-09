@@ -1,0 +1,4 @@
+Django==5.2
+python-decouple==3.8
+rich==14.0.0
+django-extensions==3.2.3

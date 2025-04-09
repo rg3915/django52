@@ -1,0 +1,454 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block picocss %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
+{% endblock picocss %}
+
+{% block content %}
+  <div
+  class="hero"
+  data-theme="dark"
+>
+  <nav class="container-fluid">
+    <ul>
+      <li>
+        <a
+          href="./"
+          class="contrast"
+        ><strong>Home</strong></a>
+      </li>
+    </ul>
+  </nav>
+  <header class="container">
+    <hgroup>
+      <h1>
+        <a
+          href="https://docs.djangoproject.com/en/5.2/releases/5.2/"
+          target="_blank"
+        >Django 5.2</a>
+      </h1>
+      <p>Vejas as novidades da nova versão.</p>
+    </hgroup>
+    <p><a
+        href="/school/"
+        role="button"
+      >Alunos</a></p>
+  </header>
+</div>
+<!-- ./ Hero -->
+
+<!-- Main -->
+<main class="container">
+    <section>
+      <hgroup>
+        <h2>
+          <a
+            href="https://docs.djangoproject.com/en/5.2/releases/5.2/#automatic-models-import-in-the-shell"
+            target="_blank"
+          >Importação automática dos modelos no shell</a>
+        </h2>
+        <h4>Automatic models import in the shell</h4>
+      </hgroup>
+
+      <p>Simplifique a Gestão de Produtos e Estoques de LED com Nosso Sistema Personalizado</p>
+
+      <figure>
+        <img
+          src="{% static 'img/01.png' %}"
+          alt="shell"
+        />
+      </figure>
+
+      <p>Ou digite simplesmente <pre>python manage.py shell</pre>
+
+      <pre>python manage.py shell -v 2</pre> é o modo verboso.</p>
+
+      <p>Se quiser, você pode desabilitar isso. Leia mais em <a href="https://docs.djangoproject.com/en/5.2/howto/custom-shell/#customizing-shell-auto-imports" target="_blank">How to customize the shell command</a></p>
+
+      <hgroup>
+        <h2>
+          <a
+            href="https://docs.djangoproject.com/en/5.2/releases/5.2/#composite-primary-keys"
+            target="_blank"
+          >Composição de Chave Estrangeira</a>
+        </h2>
+        <h4>Composite Primary Keys</h4>
+      </hgroup>
+
+      <p>O novo <a href="https://docs.djangoproject.com/en/5.2/ref/models/fields/#django.db.models.CompositePrimaryKey" target="_blank">django.db.models.CompositePrimaryKey</a> permite a criação de tabelas com uma chave primária composta por vários campos.</p>
+
+      <figure>
+        <img
+          src="{% static 'img/02.png' %}"
+          alt="composite"
+        />
+      </figure>
+
+      <h4>Exemplo 1: Sistema de Reservas de Passagens</h4>
+
+      <ul>
+        <li>Tabela: Reserva</li>
+        <li>Chave composta: (voo_id, passageiro_id)</li>
+        <li>Motivo: Um passageiro pode ter várias reservas, e um voo pode ter vários passageiros. A chave composta identifica uma reserva única por voo e passageiro.</li>
+      </ul>
+
+      <h4>Exemplo 2: Sistema de Registro de Presença em Aulas</h4>
+
+      <ul>
+        <li>Tabela: Presenca</li>
+        <li>Chave composta: (aluno_id, data, aula_id)</li>
+        <li>Motivo: Um aluno só pode ter um registro por aula por dia. Isso evita duplicidade de presença.</li>
+      </ul>
+
+      <pre>
+        classDiagram
+          class Aluno {
+              +int id
+              +string nome
+          }
+
+          class Professor {
+              +int id
+              +string nome
+          }
+
+          class Turma {
+              +int id
+              +string nome
+              +int ano
+          }
+
+          class Aula {
+              +int id
+              +date data
+              +string horario
+              +int turma_id
+              +int professor_id
+          }
+
+          class Presenca {
+              +int aluno_id
+              +int aula_id
+              +date data_presenca
+              +bool presente
+              +string observacao
+          }
+
+          %% Relações
+          Aluno "1" --> "0..*" Presenca : registra
+          Aula "1" --> "0..*" Presenca : possui
+          Turma "1" --> "0..*" Aula : contém
+          Professor "1" --> "0..*" Aula : ministra
+          Aluno "0..*" --> "1" Turma : pertence
+
+          %% Chave composta
+          note for Presenca "Chave composta: aluno_id + data_presenca + aula_id"
+      </pre>
+
+      <p>Este é o diagrama UML feito no mermaid.live</p>
+
+      <figure>
+        <img
+          src="{% static 'img/mermaid_school.png' %}"
+          alt="mermaid_school"
+        />
+      </figure>
+
+      <p>Agora veja o arquivo apps/school/models.py</p>
+
+      <p>E tente colocar admin.site.register(Attendance) no admin.py. Você vai obter o seguinte erro:</p>
+
+      Erro:
+
+      <pre>
+        .venv/lib/python3.12/site-packages/django/contrib/admin/sites.py", line 117, in register
+            raise ImproperlyConfigured(
+        django.core.exceptions.ImproperlyConfigured: The model Attendance has a composite primary key, so it cannot be registered with admin.
+      </pre>
+
+      <p>E a doc informa:</p>
+
+      <figure>
+        <img
+          src="{% static 'img/04.png' %}"
+          alt="ImproperlyConfigured"
+        />
+      </figure>
+
+      <p>Ainda estamos trabalhando no suporte a chaves primárias compostas para campos relacionais, incluindo campos GenericForeignKey, e para o Django Admin. No momento, modelos com chaves primárias compostas <b>não podem ser registrados no Django Admin</b>. Você pode esperar esse recurso em versões futuras.</p>
+
+      <p>Veja mais em apps/school e no passo a passo em "Rodando a lista de presença no shell".</p>
+
+      <p>Veja aqui a chave composta via DBeaver.</p>
+
+      <figure>
+        <img
+          src="{% static 'img/05.png' %}"
+          alt="DBeaver"
+        />
+      </figure>
+
+      <p><b>Observações:</b> O Django não oferece suporte para migração para, ou a partir de, uma chave primária composta após a criação da tabela. Também não é possível adicionar ou remover campos de uma chave primária composta por meio de migrações do Django.</p>
+
+      <p>Se você deseja migrar uma tabela existente de uma chave primária única para uma chave primária composta, siga as instruções específicas do seu sistema de banco de dados para realizar essa alteração manualmente.</p>
+
+      <p>Depois que a chave primária composta estiver definida no banco de dados, adicione o campo CompositePrimaryKey ao seu modelo. Isso permitirá que o Django reconheça e trate corretamente a chave primária composta.</p>
+
+      <p>Leia mais em <a href="https://docs.djangoproject.com/en/5.2/topics/composite-primary-key/#migrating-to-a-composite-primary-key" target="_blank">Migrating to a composite primary key</a>.</p>
+
+      <hgroup>
+        <h2>
+          <a
+            href="https://docs.djangoproject.com/en/5.2/releases/5.2/#simplified-override-of-boundfield"
+            target="_blank"
+          >Sobreescrita simplificada de BoundField</a>
+        </h2>
+        <h4>Simplified override of BoundField</h4>
+      </hgroup>
+
+      <p><b>Teremos um video exclusivo sobre isso.</b></p>
+
+      <h1>Minor features</h1>
+
+      <hgroup>
+        <h2>
+          <a
+            href=""
+            target="_blank"
+          >Forms</a>
+        </h2>
+        <h3>New Inputs</h3>
+      </hgroup>
+        <h3>ColorInput</h3>
+
+        <pre>
+          class StudentForm(forms.ModelForm):
+
+              class Meta:
+                  model = Student
+                  fields = ('name', 'class_group', 'color')
+                  widgets = {
+                      'color': forms.ColorInput()
+                  }
+        </pre>
+
+        <p>Veja school/forms.py</p>
+
+      <figure>
+        <img
+          src="{% static 'img/09.png' %}"
+          alt="forms.py"
+        />
+      </figure>
+
+        <p>Veja a aplicação rodando em localhost:8000/school/create</p>
+
+        <h3>TelInput</h3>
+
+        <pre>
+          class StudentForm(forms.ModelForm):
+
+              class Meta:
+                  model = Student
+                  fields = ('name', 'class_group', 'color', 'phone')
+                  widgets = {
+                      ...
+                      'phone': forms.TelInput(),
+                  }
+        </pre>
+
+        <p>Veja school/forms.py</p>
+
+        <p>Veja a aplicação rodando em localhost:8000/school/create</p>
+
+        <h3>SearchInput</h3>
+
+        <pre>
+          class SearchForm(forms.Form):
+              search = forms.CharField(
+                  required=False,
+                  widget=forms.SearchInput()
+              )
+
+        </pre>
+
+        <p>Veja school/forms.py</p>
+
+        <p>Veja a aplicação rodando em localhost:8000/school</p>
+
+
+        <p>Você também pode usar o <a href="https://django-phonenumber-field.readthedocs.io/en/latest/">django-phonenumber-field</a> para validar o formato do telefone no models ou no forms.</p>
+
+      <hgroup>
+        <h2>
+          <a
+            href=""
+            target="_blank"
+          >JSONArray</a>
+        </h2>
+        <h4></h4>
+      </hgroup>
+
+      <p>A nova função de banco de dados JSONArray aceita uma lista de nomes de campos ou expressões e retorna um array JSON contendo esses valores.</p>
+
+      <figure>
+        <img
+          src="{% static 'img/03.png' %}"
+          alt="jsonarray"
+        />
+      </figure>
+
+      <hgroup>
+        <h2>
+          <a
+            href=""
+            target="_blank"
+          >Templates</a>
+        </h2>
+        <h4>
+          <a
+            href="https://docs.djangoproject.com/en/5.2/howto/custom-template-tags/#django.template.Library.simple_block_tag"
+            target="_blank"
+          >simple_block_tags()</a>
+        </h4>
+      </hgroup>
+
+      <p>O novo decorador simple_block_tag() permite a criação de <b>block tags</b> simples, que podem aceitar e utilizar uma seção do template.</p>
+
+      <figure>
+        <img
+          src="{% static 'img/06.png' %}"
+          alt="shell"
+        />
+      </figure>
+
+      <figure>
+        <img
+          src="{% static 'img/07.png' %}"
+          alt="shell"
+        />
+      </figure>
+
+      <figure>
+        <img
+          src="{% static 'img/08.png' %}"
+          alt="shell"
+        />
+      </figure>
+
+      <p>Temos o card_tags.py</p>
+
+      <figure>
+        <img
+          src="{% static 'img/10.png' %}"
+          alt="card_tags"
+        />
+      </figure>
+
+      <p>Veja o student_list.html</p>
+
+      <figure>
+        <img
+          src="{% static 'img/11.png' %}"
+          alt="student_list.html"
+        />
+      </figure>
+
+      <hgroup>
+        <h2>Alterações incompatíveis com versões anteriores na versão 5.2</h2>
+        <h2>
+          <a
+            href=""
+            target="_blank"
+          >Não tem mais suporte ao PostgreSQL 13</a>
+        </h2>
+      </hgroup>
+
+      <p>O suporte oficial ao PostgreSQL 13 será encerrado em novembro de 2025. O Django 5.2 oferece suporte ao PostgreSQL 14 e versões superiores.</p>
+
+    </section>
+
+</main>
+<!-- ./ Main -->
+
+<!-- Footer -->
+<footer class="container">
+  <small>Built with <a href="https://picocss.com">Pico</a> •
+    <a href="https://github.com/picocss/examples/tree/master/v1-company/">Source code</a></small>
+</footer>
+<!-- ./ Footer -->
+
+<style>
+/* Global CSS variables */
+:root {
+  --spacing-company: 3rem;
+  --font-weight: 400;
+  --border-radius: 0;
+}
+
+/* Typography */
+h2,
+h3,
+hgroup> :last-child {
+  font-weight: 200;
+}
+
+small {
+  color: var(--muted-color);
+}
+
+.container {
+    padding: 4rem 0;
+}
+
+/* Header */
+.hero {
+  background-color: #394046;
+  background-image: url("https://media.istockphoto.com/id/1477222698/video/abstract-data-grid-seamlessly-loopable-background-animation-technology-ai-data-science-green.jpg?s=640x640&k=20&c=sDpcWOgzTuCRBpT6Nt1LLeQCwic82ZRMV5Qiiq266fc=");
+  background-position: center;
+  background-size: cover;
+}
+
+header {
+  padding: var(--spacing-company) 0;
+}
+
+header hgroup> :last-child {
+  color: var(--h3-color);
+}
+
+header hgroup {
+  margin-bottom: var(--spacing-company);
+}
+
+/* Nav */
+summary[role="link"].contrast:is([aria-current], :hover, :active, :focus) {
+  background-color: transparent;
+  color: var(--contrast-hover);
+}
+
+/* Main */
+@media (min-width: 992px) {
+  main .grid {
+    grid-column-gap: var(--spacing-company);
+    grid-template-columns: auto 25%;
+  }
+}
+
+form.grid {
+  grid-row-gap: 0;
+}
+
+/* Aside nav */
+aside img {
+  margin-bottom: 0.25rem;
+}
+
+aside p {
+  margin-bottom: var(--spacing-company);
+  line-height: 1.25;
+}
+</style>
+{% endblock content %}

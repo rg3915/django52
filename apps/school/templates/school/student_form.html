@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container">
+    <h1>Cadastrar Aluno</h1>
+
+    <form action="" method="POST">
+      {% csrf_token %}
+
+      {{ form.as_p }}
+
+      <button type="submit">Salvar</button>
+    </form>
+  </div>
+{% endblock content %}
